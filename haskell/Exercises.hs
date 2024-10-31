@@ -25,7 +25,7 @@ firstThenApply ::  [a] -> (a -> Bool) -> (a -> b) -> Maybe b
 firstThenApply x p f = f <$> find p x
 -- Write your infinite powers generator here
 powers :: Integral b => b -> [b]
-powers base = (base^) <$> [0..]
+powers b = (b^) <$> [0..]
 -- Write your line count function here
 
 -- Write your shape data type here
