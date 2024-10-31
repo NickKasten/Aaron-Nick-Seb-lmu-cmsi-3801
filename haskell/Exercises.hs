@@ -30,7 +30,6 @@ firstThenApply x p f = f <$> find p x
 powers :: Integral b => b -> [b]
 powers base = (base^) <$> [0..]
 
--- If the exceptions aren't propagating here someone'll have to add them
 meaningfulLineCount :: FilePath -> IO Int
 meaningfulLineCount filename = fmap (length . filterMeaningless . lines) (readFile filename)
   where
