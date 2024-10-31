@@ -1,4 +1,4 @@
-import { open } from "node:fs/promises"
+import { open, FileHandle } from "node:fs/promises"
 
 export function change(amount: bigint): Map<bigint, bigint> {
   if (amount < 0) {
@@ -12,8 +12,6 @@ export function change(amount: bigint): Map<bigint, bigint> {
   }
   return counts
 }
-
-// Write your first then apply function here
 
 export function firstThenApply<T, R>(arr: T[], predicate: (val: T) => boolean, transformer: (val: T) => R): R | undefined {
 
@@ -29,10 +27,6 @@ export function firstThenApply<T, R>(arr: T[], predicate: (val: T) => boolean, t
   return undefined;
 }
 
-
-
-// Write your powers generator here
-
 export function* powersGenerator(base: bigint): Generator<bigint> {
   let exponent = 0n; 
   while (true) {
@@ -41,9 +35,18 @@ export function* powersGenerator(base: bigint): Generator<bigint> {
   }
 }
 
-
-
 // Write your line count function here
+export async function meaningfulLineCount(filename: String) : Promise<number | null> {
+  const file = await open(Buffer.from(filename, "utf8"), 'r');
+  let lineCount = 0;
+  for await (const line of file.readLines()) {
+    const trimmedLine = line.trim();
+    if ((trimmedLine) && !(trimmedLine.startsWith("#"))) {
+      lineCount++;
+    }
+  }
+  return lineCount;
+}
 
 // Write your shape type and associated functions here
 
@@ -111,3 +114,62 @@ export function toString(shape: Shape): string {
 }
 
 // Write your binary search tree implementation here
+
+export interface BinarySearchTree<T> {
+  size(): number;
+  insert(value: T): BinarySearchTree<T>;
+  contains(value: T): boolean;
+  inorder(): Iterable<T>;
+}
+
+export class Empty<T> implements BinarySearchTree<T> {
+  size(): number {
+    return 0;
+  }
+  insert(value: T): BinarySearchTree<T> {
+      return new Node(new Empty(), value, new Empty());
+  }
+  contains(value: T): boolean {
+      return false;
+  }
+  *inorder(): Iterable<T> {}
+  toString(): String {
+    return "()";
+  }
+}
+
+class Node<T> implements BinarySearchTree<T>{
+  constructor(
+    private readonly left: BinarySearchTree<T>,
+    private readonly value: T,
+    private readonly right: BinarySearchTree<T>
+  ) {}
+  
+  size(): number {
+    return this.left.size() + 1 + this.right.size();
+  }
+
+  insert(next_value: T): BinarySearchTree<T> {
+    return (next_value === this.value) ? new Node(this.left, this.value, this.right)
+      : (next_value < this.value) ? new Node(this.left.insert(next_value), this.value, this.right)
+      : new Node(this.left, this.value, this.right.insert(next_value));
+  }
+
+  contains(search_value: T): boolean {
+    return ((search_value === this.value) 
+    || this.left.contains(search_value) 
+    || this.right.contains(search_value));
+  }
+  
+  *inorder(): Iterable<T> {
+      yield* this.left.inorder();
+      yield this.value;
+      yield* this.right.inorder();
+  }
+
+  toString(): String {
+    const leftChildString = (this.left instanceof Node) ? `${this.left}` : "";
+    const rightChildString = (this.right instanceof Node) ? `${this.right}` : "";
+    return `(${leftChildString}${this.value}${rightChildString})`;
+  } 
+}
