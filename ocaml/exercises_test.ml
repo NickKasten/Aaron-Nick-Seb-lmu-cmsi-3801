@@ -65,7 +65,7 @@ suite "meaningful_line_count";;
 try (meaningful_line_count("no-such-file.txt") |> fun _ -> expect false) with
   | Sys_error _ -> expect true;;
 expect(meaningful_line_count("../test-for-line-count.txt") == 5);;
-
+*)
 suite "shape";;
 let s1 = Sphere 5.0 in
 let s2 = Box (3.0, 4.0, 5.0) in (
@@ -97,6 +97,6 @@ let t5 = insert 4 t4 in (
   expect (inorder t4 = [3; 5; 7]);
   expect (inorder t5 = [3; 4; 5; 7]);
 );;
-*)
+
 
 Printf.printf "\n%d passed, %d failed\n" !passes !failures;;

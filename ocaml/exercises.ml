@@ -56,14 +56,31 @@ let surface_area f =
   | Box (l, w, h) -> 2. *. (w *. l +. h *. l +. h *. w)
   
 (* Write your binary search tree implementation here *)
-type 'a bst =
+type 'a binary_tree =
   | Empty
-  | Node of 'a bst * 'a * bst
+  | Node of 'a binary_tree * 'a * 'a binary_tree
 
-(* BAD *)
-let insert v t =
-  match t with
-  | Empty -> Node Empty v Empty
+let rec size bst =
+  match bst with
+  | Empty -> 0
+  | Node (l, c, r) -> size l + 1 + size r
+
+let rec insert v bst =
+  match bst with
+  | Empty -> Node (Empty, v, Empty)
   | Node (l, c, r) -> 
-    if c == v then Node l c r
-    else if c < v then Node (insert )
+    if v == c then Node (l, c, r)
+    else if v < c then Node (insert v l, c, r)
+    else Node (l, c, insert v r)
+
+let rec contains v bst = 
+  match bst with
+  | Empty -> false
+  | Node (l, c, r) -> 
+    if v == c then true
+    else contains v l || contains v r
+
+let rec inorder bst =
+  match bst with
+  | Empty -> []
+  | Node (l, c, r) -> inorder l @ [c] @ inorder r
