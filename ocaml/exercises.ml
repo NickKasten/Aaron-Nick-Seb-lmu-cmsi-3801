@@ -1,5 +1,4 @@
 exception Negative_Amount
-open Fun;;
 
 let change amount =
   if amount < 0 then
@@ -28,18 +27,18 @@ let powers_generator base =
     Seq.Cons (n, aux (n * base))
   in
   aux 1
-  
-(*
+
 let meaningful_line_count filename =
-  val count_line 
   (* Based on code found in https://ocaml.org/docs/file-manipulation *)
   (* And also https://ocaml.org/docs/error-handling *)
-  # let ic = open_in filename in
-    let finally () = close_in ic in
-    let work () = head_channel ic in
-    Fun.protect ~finally work;;
-*)
-(* Write your shape type and associated functions here *)
+  (* And also the helper video *)
+  (* There are probably better ways to do this but they sound hard *)
+  let ic = open_in filename in
+  let get_lines str = String.split_on_char '\n' str in
+  let trim_lines lines = List.filter (fun s -> not (String.equal s String.empty)) (List.map String.trim lines) in
+  let remove_meaningless = List.filter (fun s -> (String.get s 0) != '#') (trim_lines (get_lines (In_channel.input_all ic))) in
+  let finally () = close_in ic in
+  Fun.protect ~finally (fun () -> List.length remove_meaningless);;
 
 type form =
   | Sphere of float
@@ -54,8 +53,7 @@ let surface_area f =
   match f with
   | Sphere r -> 4. *. Float.pi *. (r ** 2.)
   | Box (l, w, h) -> 2. *. (w *. l +. h *. l +. h *. w)
-  
-(* Write your binary search tree implementation here *)
+
 type 'a binary_tree =
   | Empty
   | Node of 'a binary_tree * 'a * 'a binary_tree
@@ -63,7 +61,7 @@ type 'a binary_tree =
 let rec size bst =
   match bst with
   | Empty -> 0
-  | Node (l, c, r) -> size l + 1 + size r
+  | Node (l, _, r) -> size l + 1 + size r
 
 let rec insert v bst =
   match bst with
