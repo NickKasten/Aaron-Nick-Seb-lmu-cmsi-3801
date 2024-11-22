@@ -11,6 +11,7 @@ package-lock.json
 test.jar
 a.out
 a.exe
+*.exe
 *.class
 *.log
 *.hi

@@ -16,7 +16,7 @@ void expect(const char* description, bool condition) {
 // -----------------------------------------------------------------------------
 
 int main() {
-
+    
     // Successful create (can't test out of memory though)
     stack_response res = create();
     expect("Stack creation response is success", res.code == success);
@@ -24,7 +24,7 @@ int main() {
     expect("New stack empty", is_empty(s));
     expect("New stack not full", !is_full(s));
     expect("New stack size 0", size(s) == 0);
-
+    
     // Individual elements are bounds checked
     char long_string[258];
     memset(long_string, 'x', 257);
@@ -56,7 +56,7 @@ int main() {
     expect("Pop after full stack not full", !is_full(s));
     expect("Pop after full stack size MAX_CAPACITY-1", size(s) == MAX_CAPACITY-1);
     expect("Popped value is expected", strcmp(r.string, "hi") == 0);
-
+    
     // Pop until empty
     while (size(s) > 0) r = pop(s);
     expect("After popping everything, empty", is_empty(s));
@@ -79,7 +79,7 @@ int main() {
     // Destroy sets to null, for memory leak testing use an external tool
     destroy(&s);
     assert(s == NULL);
-  
+
     printf("\n%d passed, %d failed\n", passed, failed);
     return 0;
 }
