@@ -4,15 +4,14 @@ pub struct Stack<T> {
 }
 
 impl<T> Stack<T> {
-    // Implement new
     fn new() -> Stack<T> {
         Stack {items: Vec::<T>::new()}
     }
-    // Implement push
+    
     fn push(&mut self, value: T) {
         self.items.push(value);
     }
-    // Implement pop
+    
     fn pop(&mut self) -> Option<T> {
         let value: Option<T> = self.items.pop();
         match value {
@@ -20,7 +19,7 @@ impl<T> Stack<T> {
             None => None,
         }
     }
-    // Implement peek
+    
     fn peek(&self) -> Option<&T> {
         let value: Option<&T> = self.items.last();
         match value {
@@ -28,11 +27,11 @@ impl<T> Stack<T> {
             None => None,
         }
     }
-    // Implement is_empty
+    
     fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
-    // Implement len
+   
     fn len(&self) -> usize {
         self.items.len()
     }
