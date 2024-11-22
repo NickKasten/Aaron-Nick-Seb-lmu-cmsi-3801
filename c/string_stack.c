@@ -1,7 +1,6 @@
 #include "string_stack.h"
 #include "stdlib.h"
 #include "string.h"
-#include "stdio.h"
 
 #define MIN_CAPACITY 16
 
