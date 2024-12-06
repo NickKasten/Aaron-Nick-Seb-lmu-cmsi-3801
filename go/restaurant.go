@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-// A little utility that simulates performing a task for a random duration.
-// For example, calling do(10, "Remy", "is cooking") will compute a random
-// number of milliseconds between 5000 and 10000, log "Remy is cooking",
-// and sleep the current goroutine for that much time.
-
 func do(seconds int, action ...any) {
     log.Println(action...)
     randomMillis := 500 * seconds + rand.Intn(500 * seconds)
@@ -29,7 +24,7 @@ type order struct {
 }
 
 func newOrder (customer string) *order {
-	o := order{customer: customer, reply: make(chan *order, 1)}
+	o := order{customer: customer, reply: make(chan *order, 2)}
 	totalOrders.Add((1))
 	o.id = totalOrders.Load()
 	return &o
@@ -48,22 +43,21 @@ func dine(name string, waiter chan *order,  wg *sync.WaitGroup) {
 	for mealsEaten < maxMeals {
 		order := newOrder(name)
 		log.Println(name, "placed order #", order.id)
-		waiter <- order
-
 		select {
-		case recievedOrder := <- order.reply:
-			do(eatTime, name, "eating cooked order #", recievedOrder.id, "prepared by", recievedOrder.preparedBy)
+		case waiter <- order:
+			recievedOrder := <- order.reply
+			do(eatTime, name, "is eating cooked order #", recievedOrder.id, "prepared by", recievedOrder.preparedBy)
 			mealsEaten++
 		case <- time.After(maxWaitTime * time.Second):
-			do(leaveTime, name, "stormed out of the restaurant after waiting for order #", order.id)
+			do(leaveTime, name, "stormed out of the restaurant, abandoning order #", order.id)
 		}
 	}
-	log.Println(name, "was satiated and left the restaurant.")
+	log.Println(name, "was satiated and left the restaurant")
 }
 
 const cookTime = 10
 func cook(name string, waiter chan *order){
-	log.Println(name, "starting work") 
+	log.Println(name, "is ready to cook") 
 	for {
 		// Seabass did the following code but I'm not sure if it works
 		// breaking out the for loop would just put the chef out of commision
