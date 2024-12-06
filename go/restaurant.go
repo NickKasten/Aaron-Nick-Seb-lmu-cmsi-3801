@@ -19,8 +19,6 @@ func do(seconds int, action ...any) {
     time.Sleep(time.Duration(randomMillis) * time.Millisecond)
 }
 
-var waiter chan *order = make(chan *order, 3)
-
 var totalOrders atomic.Uint64
 
 type order struct {
@@ -37,52 +35,66 @@ func newOrder (customer string) *order {
 	return &o
 } 
 
+// Toal might feel differently about these consts than I do
 const maxMeals = 5
-type customer struct {
-	name string
-	mealsEaten uint8
-}
-
-func (c customer) dine(waiter chan *order) {
-	for c.mealsEaten > maxMeals {
-		order := newOrder(c.name)
-		log.Println(c.name, "placed order #", order.id)
+// Time values are in seconds
+const maxWaitTime = 7
+const eatTime = 2
+const leaveTime = 5
+func dine(name string, waiter chan *order,  wg *sync.WaitGroup) {
+	defer wg.Done()
+	log.Println(name, "has entered the restaurant.")
+	mealsEaten := 0
+	for mealsEaten < maxMeals {
+		order := newOrder(name)
+		log.Println(name, "placed order #", order.id)
 		waiter <- order
 
 		select {
 		case recievedOrder := <- order.reply:
-			log.Println(c.name, "eating cooked order #", recievedOrder.id, "prepared by", recievedOrder.preparedBy)
-		case <- time.After(7 * time.Second):
-			log.Println(c.name, "has grown too impatient waiting for order #", order.id)
+			do(eatTime, name, "eating cooked order #", recievedOrder.id, "prepared by", recievedOrder.preparedBy)
+			mealsEaten++
+		case <- time.After(maxWaitTime * time.Second):
+			do(leaveTime, name, "has stormed out of the restaurant after waiting for order #", order.id)
 		}
 	}
+	log.Println(name, "is satiated and has left the restaurant.")
 }
 
 
-func cook(name string, waiter chan *order,  wg *sync.WaitGroup){
-	defer wg.Done() // signal when work is finshed 
+func cook(name string, waiter chan *order){
 	log.Println(name, "starting work") 
-	for { //process orders from waiter channel 
-		order, ok := waiter
-		if !ok { // channel closed, then end the gorouinte 
-			break
-		}
-		// logs action 
+	for {
+		// Seabass did the following code but I'm not sure if it works
+		// breaking out the for loop would just put the chef out of commision
+		// for the rest of the program's lifetime
+		// and channel reading blocks automatically
+
+		//order, ok := <- waiter
+		//if !ok {
+		//	break
+		//}
+		order := <- waiter
 		do(10, name, "cooking order", order.id, "for", order.customer)
-		order.preparedBy = name // records name of cook who made order 
-		order.reply <- order // sned bacl to customoer 
+		order.preparedBy = name
+		order.reply <- order
 	}
 }
 
 func main() {
+	var wg sync.WaitGroup
+	var waiter chan *order = make(chan *order, 3)
 	customers := [...]string{"Ani", "Bai", "Cat", "Dao", "Eve", "Fay", "Gus", "Hua", "Iza", "Jai"}
-	cooks := [...]string{"Remy", "Colette", "Linguini"}
+	chefs := [...]string{"Remy", "Colette", "Linguini"}
+
+	for _, customer := range customers {
+		wg.Add(1)
+		go dine(customer, waiter, &wg)
+	}
+	for _, chef := range chefs {
+		go cook(chef, waiter)
+	}
 	
+	wg.Wait()
+	log.Println("The restaurant is now closed.")
 }
-
-
-
-
-
-// Implement the rest of the simulation here. You may need to add more imports
-// above.
