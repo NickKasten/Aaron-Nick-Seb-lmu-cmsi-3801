@@ -30,9 +30,8 @@ func newOrder (customer string) *order {
 	return &o
 } 
 
-// Toal might feel differently about these consts than I do
 const maxMeals = 5
-// Time values are in seconds
+
 const maxWaitTime = 7
 const eatTime = 2
 const leaveTime = 5
@@ -59,15 +58,6 @@ const cookTime = 10
 func cook(name string, waiter chan *order){
 	log.Println(name, "is ready to cook") 
 	for {
-		// Seabass did the following code but I'm not sure if it works
-		// breaking out the for loop would just put the chef out of commision
-		// for the rest of the program's lifetime
-		// and channel reading blocks automatically
-
-		//order, ok := <- waiter
-		//if !ok {
-		//	break
-		//}
 		order := <- waiter
 		do(cookTime, name, "began cooking order #", order.id, "for", order.customer)
 		order.preparedBy = name
